@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using DeezerJsonApiWrapperNet;
+using DeezerJsonApiWrapperNet.ApiConsts;
 using DeezerJsonApiWrapperNet.ApiObjects.Enums;
 using Newtonsoft.Json;
 
@@ -69,7 +70,7 @@ namespace DeezerJsonApiWrapperNet.ApiObjects
 		[JsonProperty(ApiConsts.Album.RecordType)]
 		private string _recordType;
 		[JsonIgnore]
-		public RecordType RecordType => (RecordType)Enum.Parse(typeof(RecordType), _recordType, true);
+		public RecordType RecordType => Parser.Parse<RecordType>(_recordType);
 
 		[JsonProperty(ApiConsts.Album.Available)]
 		public bool Available { get; set; }

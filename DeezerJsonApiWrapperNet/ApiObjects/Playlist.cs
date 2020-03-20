@@ -83,22 +83,7 @@ namespace DeezerJsonApiWrapperNet.ApiObjects
 		{
 			JsonContent = await Runtime.ExecuteHttpGetAsync(UriPrefix);
 
-			var tracksRequest = ApiConsts.Playlist.Tracks;
-			PagedList<Track> tracksPortion;
-			Tracks = new List<Track>();
-
-			do
-			{
-				string queryString = new Uri(tracksRequest).Query;
-				var queryDictionary = HttpUtility.ParseQueryString(queryString);
-
-				var nextIndexParameter = new[] { $"index={queryDictionary.Get("index")}" };
-				tracksPortion = await Runtime.DeserializeEntitiesFromData<Track>(await SendGetAsync(ApiConsts.Playlist.Tracks, nextIndexParameter));
-				Tracks.AddRange(tracksPortion);
-				tracksRequest = tracksPortion.NextUri;
-			}
-			while (!string.IsNullOrEmpty(tracksRequest));
-
+			Tracks = await LoadPagedContent<Track>(ApiConsts.Playlist.Tracks);
 		}
 
 		public async Task AddComment(int rating)

@@ -2,6 +2,7 @@
 using LazyCache;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,13 +13,13 @@ namespace DeezerJsonApiWrapperNet.Runtime
 	{
 		private readonly CachingService _cache = new CachingService();
 
-		private const string ApiEndpoint = "http://api.deezer.com/";
+		private readonly string ApiEndpoint = "https://api.deezer.com/";
 
 		private readonly HttpClient _httpClient;
 		private readonly string _accessToken;
 		private readonly SerializationHelper _serializer;
 
-		public Me CurrentUser { get; set; }
+		private Me _me;
 
 		public DeezerRuntime(string accessToken)
 		{
@@ -27,14 +28,24 @@ namespace DeezerJsonApiWrapperNet.Runtime
 			_serializer = new SerializationHelper(this);
 		}
 
-		public async Task InitCurrentUser()
+		public async Task<User> GetCurrentUser()
 		{
-			CurrentUser = await GetEntity<Me>(ApiConsts.Me.Self).ConfigureAwait(false);
+			if (_me == null)
+			{
+				_me = await GetEntity<Me>(ApiConsts.Me.Self).ConfigureAwait(false);
+			}
+
+			return _me;
 		}
 
 		public async Task<string> ExecuteHttpGetAsync(string method, string[] queryParameters = null)
 		{
 			var requestUri = GenerateRequestUri(method, queryParameters);
+			return await GetResponse(requestUri).ConfigureAwait(false);
+		}
+
+		public async Task<string> ExecuteHttpGetAsIsAsync(string requestUri)
+		{
 			return await GetResponse(requestUri).ConfigureAwait(false);
 		}
 

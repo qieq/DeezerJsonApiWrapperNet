@@ -6,6 +6,7 @@ namespace DeezerJsonApiWrapperNet
 	public interface IRuntime
 	{
 		Task<string> ExecuteHttpGetAsync(string method, string[] queryParameters = null);
+		Task<string> ExecuteHttpGetAsIsAsync(string requestUri);
 		Task<string> ExecuteHttpDeleteAsync(string method, string[] queryParameters = null);
 		Task<string> ExecuteHttpPostAsync(string method, Dictionary<string, string> content, string[] queryParameters = null);
 

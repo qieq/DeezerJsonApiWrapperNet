@@ -43,6 +43,32 @@ namespace DeezerJsonApiWrapperNet
 			return Runtime.ExecuteHttpGetAsync(UriPrefix + uriPostfix, queryParameters);
 		}
 
+		protected Task<string> SendGetAsIsAsync(string uri)
+		{
+			ValidateRequest();
+			return Runtime.ExecuteHttpGetAsIsAsync(uri);
+		}
+
+		protected async Task<List<T>> LoadPagedContent<T>(string firstPageUriPostfix)
+			where T : JsonDeserialized
+		{
+			PagedList<T> page;
+			var content = new List<T>();
+
+			page = await Runtime.DeserializeEntitiesFromData<T>(await SendGetAsync(firstPageUriPostfix));
+			content.AddRange(page);
+
+			var nextPageUri = page.NextUri;
+			while (!string.IsNullOrEmpty(nextPageUri))
+			{
+				page = await Runtime.DeserializeEntitiesFromData<T>(await SendGetAsIsAsync(nextPageUri));
+				content.AddRange(page);
+				nextPageUri = page.NextUri;
+			}
+
+			return content;
+		}
+
 		private void ValidateRequest()
 		{
 			if (Runtime == null)
